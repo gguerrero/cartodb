@@ -35,6 +35,7 @@ class User < Sequel::Model
   extend Carto::UserAuthenticator
 
   self.strict_param_setting = false
+  attr_accessor :force_drop_cascade
 
   # @param name             String
   # @param avatar_url       String
@@ -400,7 +401,7 @@ class User < Sequel::Model
 
     # Delete the DB or the schema
     if has_organization
-      db_service.drop_organization_user(organization_id, !@org_id_for_org_wipe.nil?) unless error_happened
+      db_service.drop_organization_user(organization_id, !@org_id_for_org_wipe.nil?, @force_drop_cascade) unless error_happened
     elsif ::User.where(database_name: database_name).count > 1
       raise CartoDB::BaseCartoDBError.new(
         'The user is not supposed to be in a organization but another user has the same database_name. Not dropping it')

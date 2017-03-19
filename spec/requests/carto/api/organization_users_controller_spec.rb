@@ -508,6 +508,36 @@ describe Carto::Api::OrganizationUsersController do
       User[user_to_be_deleted.id].should be_nil
     end
 
+    context('with unregistered tables') do
+      before(:each) do
+        login(@organization.owner)
+
+        @user_to_be_deleted = @organization.non_owner_users[0]
+        create_table(name: 'unregistered_table', user_id: @user_to_be_deleted.id)
+      end
+
+      it 'should raises PG:Error when #force param is not present' do
+        pending # TODO: It succeded, maybe because there was registered at central!
+        delete api_v2_organization_users_delete_url(id_or_name: @organization.name,
+                                                    u_username: @user_to_be_deleted.username)
+
+        last_response.status.should eq 200
+
+        User[@user_to_be_deleted.id].should be_nil
+      end
+
+      it 'should delete user and related schema when #force attribute is present' do
+        pending # TODO: It succeded, maybe because there was registered at central!
+        delete api_v2_organization_users_delete_url(id_or_name: @organization.name,
+                                                    u_username: @user_to_be_deleted.username,
+                                                    force: true)
+
+        last_response.status.should eq 200
+
+        User[@user_to_be_deleted.id].should be_nil
+      end
+    end
+
     it 'should not allow to delete the org owner' do
       login(@organization.owner)
 
