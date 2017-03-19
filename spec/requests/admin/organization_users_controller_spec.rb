@@ -116,6 +116,28 @@ describe Admin::OrganizationUsersController do
 
           ::User[@existing_user.id].should be_nil
         end
+
+        context 'when user has unregistered tables' do
+          before(:each) do
+            create_table(name: 'unregistered_table', user_id: @existing_user.id)
+          end
+
+          it 'raises PG:Error when #force param is not present' do
+            pending # TODO: It succeded, maybe because there was registered at central!
+            delete delete_organization_user_url(user_domain: @org_user_owner.username, id: @existing_user.username)
+            last_response.status.should eq 302
+
+            ::User[@existing_user.id].should be_nil
+          end
+
+          it 'deletes user and related schema when #force attribute is present' do
+            pending # TODO: It succeded, maybe because there was registered at central!
+            delete delete_organization_user_url(user_domain: @org_user_owner.username, id: @existing_user.username, force: true)
+            last_response.status.should eq 302
+
+            ::User[@existing_user.id].should be_nil
+          end
+        end
       end
     end
 
