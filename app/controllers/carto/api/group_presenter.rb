@@ -59,7 +59,7 @@ module Carto
       end
 
       def users
-        @group.users.map { |u| Carto::Api::UserPresenter.new(u, { fetch_groups: false } ).to_poro }
+        @group.users.map { |u| Carto::Api::UserPresenter.new(u, { fetch_groups: false } ).to_poro_without_id }
       end
 
     end

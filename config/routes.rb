@@ -611,6 +611,12 @@ CartoDB::Application.routes.draw do
         get    'users/:u_username', to: 'organization_users#show',    as: :api_v2_organization_users_show
         delete 'users/:u_username', to: 'organization_users#destroy', as: :api_v2_organization_users_delete
         put    'users/:u_username', to: 'organization_users#update',  as: :api_v2_organization_users_update
+
+        get    'groups',               to: 'organization_groups#index',    as: :api_v2_organization_groups_index
+        post   'groups',               to: 'organization_groups#create',   as: :api_v2_organization_groups_create
+        get    'groups/:g_groupname',  to: 'organization_groups#show',     as: :api_v2_organization_groups_show
+        delete 'groups/:g_groupname',  to: 'organization_groups#destroy',  as: :api_v2_organization_groups_destroy
+        put    'groups/:g_groupname',  to: 'organization_groups#update',   as: :api_v2_organization_groups_update
       end
     end
 
