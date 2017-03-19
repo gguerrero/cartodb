@@ -10,40 +10,12 @@ describe Carto::Api::OrganizationUsersController do
   include Rack::Test::Methods
   include Warden::Test::Helpers
 
-
-  before(:all) do
-    @carto_org_user_1 = Carto::User.find(@org_user_1.id)
-    @org_user_1_json = { "id" => @org_user_1.id,
-                         "username" => @org_user_1.username,
-                         "avatar_url" => @org_user_1.avatar_url,
-                         "base_url" => @org_user_1.public_url,
-                         "viewer" => false
-                       }
-    @carto_org_user_2 = Carto::User.find(@org_user_2.id)
-
-    @group_1 = FactoryGirl.create(:random_group, display_name: 'g_1', organization: @carto_organization)
-    @group_1_json = { 'id' => @group_1.id, 'organization_id' => @group_1.organization_id, 'name' => @group_1.name, 'display_name' => @group_1.display_name }
-    @group_2 = FactoryGirl.create(:random_group, display_name: 'g_2', organization: @carto_organization)
-    @group_2_json = { 'id' => @group_2.id, 'organization_id' => @group_2.organization_id, 'name' => @group_2.name, 'display_name' => @group_2.display_name }
-    @group_3 = FactoryGirl.create(:random_group, display_name: 'g_3', organization: @carto_organization)
-    @group_3_json = { 'id' => @group_3.id, 'organization_id' => @group_3.organization_id, 'name' => @group_3.name, 'display_name' => @group_3.display_name }
-    @headers = {'CONTENT_TYPE'  => 'application/json', :format => "json" }
-  end
-
-  after(:all) do
-    @group_1.destroy
-    @group_2.destroy
-    @group_3.destroy
-  end
-
-  before(:each) do
-    @carto_organization.reload
-  end
-
   describe('group list') do
+    pending
   end
 
   describe('group show') do
+    pending
   end
 
   describe('group creation') do
@@ -53,7 +25,7 @@ describe Carto::Api::OrganizationUsersController do
     end
 
     it 'returns 401 for non authorized users' do
-      login(@carto_org_user_1)
+      login(@org_user_1)
 
       post api_v2_organization_groups_create_url(id_or_name: @carto_organization.name)
       last_response.status.should == 401
@@ -65,8 +37,37 @@ describe Carto::Api::OrganizationUsersController do
       post api_v2_organization_groups_create_url(id_or_name: @carto_organization.name)
       last_response.status.should == 410
     end
+
+    it "correctly creates a group" do
+      display_name = 'a new group'
+      name = 'a new group'
+
+      # Replacement for extension interaction
+      fake_database_role = 'fake_database_role'
+      fake_group_creation = Carto::Group.new_instance(@carto_organization.database_name, name, fake_database_role)
+      fake_group_creation.save
+      Carto::Group.expects(:create_group_extension_query).with(anything, name).returns(fake_group_creation)
+
+      params = { display_name: display_name }
+      post api_v2_organization_groups_create_url(user_domain: @org_user_owner.username, id_or_name: @carto_organization.name, api_key: @org_user_owner.api_key), params
+
+      last_response.status.should eq 200
+
+      # Also check database data because Group changes something after extension interaction
+      last_response_body = JSON.parse(last_response.body)
+      new_group = Carto::Group.find(last_response_body['id'])
+      new_group.organization_id.should == @carto_organization.id
+      new_group.name.should == name
+      new_group.display_name.should == display_name
+      new_group.database_role.should_not be_nil
+      end
   end
 
-  describe('group update')
-  describe('group destroy')
+  describe('group update') do
+    pending
+  end
+
+  describe('group destroy') do
+    pending
+  end
 end
