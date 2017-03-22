@@ -35,6 +35,10 @@ module OrganizationUsersHelper
     current_viewer.id == @organization.owner.id
   end
 
+  def set_user_force_drop_cascade
+    @user.force_drop_cascade = (params[:force] == 'true' || false)
+  end
+
   # To help with strong params until Rails 4+
   def permit(*permitted)
     hardened_params = params.dup

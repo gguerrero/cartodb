@@ -177,7 +177,7 @@ class Admin::OrganizationUsersController < Admin::AdminController
   def destroy
     raise "Can't delete user. #{'Has shared entities' if @user.has_shared_entities?}" unless @user.can_delete
 
-    @user.force_drop_cascade = (params[:force] == 'true' || false)
+    set_user_force_drop_cascade
     @user.destroy
     @user.delete_in_central
     flash[:success] = "User was successfully deleted."

@@ -121,7 +121,7 @@ module Carto
           render_jsonp "Can't delete @user. #{'Has shared entities' if @user.has_shared_entities?}", 410
         end
 
-        @user.force_drop_cascade = (params[:force] == 'true' || false)
+        set_user_force_drop_cascade
         @user.destroy
         @user.delete_in_central
 
